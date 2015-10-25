@@ -43,8 +43,1602 @@
 		"ItemShareability"				"ITEM_NOT_SHAREABLE"
 		"ItemDeclaresPurchase"			"0"
 	}
+	
+	
+	
+	
+	
+	
+		// Rewrite of the Venomancer Plague Ward ability
+	// Author: Pizzalol and Rook
+	// Date: 30.09.2015.
+	"venomancer_op_plague_ward_datadriven"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"BaseClass"						"ability_datadriven"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_POINT"
+		"AbilityUnitDamageType"			"DAMAGE_TYPE_PHYSICAL"	
+		"SpellImmunityType"				"SPELL_IMMUNITY_ENEMIES_YES"
+		"AbilityTextureName"			"venomancer_plague_ward"
+	
+		// Precache
+		//-------------------------------------------------------------------------------------------------------------
+		"precache"
+		{
+			"soundfile"			"soundevents/game_sounds_heroes/game_sounds_venomancer.vsndevts"
+			"model"				"models/heroes/venomancer/venomancer_ward.vmdl"
+		}
+	
+		// Casting
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCastRange"				"850"
+		"AbilityCastPoint"				"0.0 0.0 0.0 0.0"
+	
+		// Time		
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCooldown"				"0.0"
+		
+		// Cost
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityManaCost"				"25 50 75 100"
+		
+		// Special	
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"				"FIELD_FLOAT"
+				"duration"				"300.0"
+			}
+			"02"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"ward_hp_tooltip"		"50 100 200 300"
+			}
+			"03"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"ward_damage_tooltip"	"20 30 40 50"
+			}
+		}
+	
+		"OnSpellStart"
+		{			
+			"RunScript"
+			{
+				"ScriptFile"		"heroes/hero_venomancer/plague_ward.lua"
+				"Function"			"venomancer_plague_ward_datadriven_on_spell_start"
+				"Target"			"POINT"
+				"Duration"			"%duration"
+			}
+		}
+		
+		"Modifiers"
+		{
+			"modifier_plague_ward_datadriven"
+			{
+				"Passive"		"0"
+				"IsHidden"		"1"
+				"IsBuff"		"1"
+				"IsDebuff"		"0"
+				"IsPurgable"	"0"
+	
+				"OnAttackLanded"
+				{
+					"RunScript"
+					{
+						"ScriptFile"		"heroes/hero_venomancer/plague_ward.lua"
+						"Function"			"modifier_plague_ward_datadriven_on_attack_landed"
+					}
+				}
+			}
+			
+			//A hidden modifier.  Stacks of this modifier are used to slow the target by the correct amount.
+			//The stack count is set to 0 when a Poison Sting debuff originating from Venomancer is applied, and restored when that debuff
+			//expires, if this modifier still exists.
+			"modifier_plague_ward_datadriven_poison_sting_debuff_movement_speed"
+			{
+				"Passive"		"0"
+				"IsHidden"		"1"
+				"IsBuff"		"0"
+				"IsDebuff"		"1"
+				"IsPurgable"	"1"
+	
+				"Properties"
+				{
+					"MODIFIER_PROPERTY_MOVESPEED_BONUS_PERCENTAGE"		"-1"
+				}
+			}
+			
+			//A visible modifier.  Deals damage over time to the target, but only if the target does not also have a 
+			//Poison Sting debuff originating from Venomancer.
+			"modifier_plague_ward_datadriven_poison_sting_debuff"
+			{
+				"Passive"		"0"
+				"IsHidden"		"0"
+				"IsBuff"		"0"
+				"IsDebuff"		"1"
+				"IsPurgable"	"1"
+	
+				"ThinkInterval"	"1.0"
+				"OnIntervalThink"
+				{
+					"RunScript"
+					{
+						"ScriptFile"		"heroes/hero_venomancer/plague_ward.lua"
+						"Function"			"modifier_plague_ward_datadriven_debuff_on_interval_think"
+					}
+				}
+	
+				"OnCreated"
+				{
+					"RunScript"
+					{
+						"ScriptFile"		"heroes/hero_venomancer/plague_ward.lua"
+						"Function"			"modifier_plague_ward_datadriven_debuff_on_interval_think"
+					}
+				}
+			}
+		}		
+	}
+	
+//==================================================================================================
+// veno nova
+//==================================================================================================
+
+	// Rewrite of the Venomancer Poison Nova ability
+	// Author: Pizzalol
+	// Date: 30.09.2015.
+	// NOTE: Doesnt travel as an expanding circle around the hero but instead acts as an instant AOE ability
+	"venomancer_op_poison_nova_datadriven"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"BaseClass"				"ability_datadriven"
+		"AbilityType"					"DOTA_ABILITY_TYPE_ULTIMATE"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+		"AbilityUnitDamageType"			"DAMAGE_TYPE_MAGICAL"	
+		"SpellImmunityType"				"SPELL_IMMUNITY_ENEMIES_YES"
+		"FightRecapLevel"				"2"
+		"AbilityTextureName"			"venomancer_poison_nova"
+	
+		// Precache
+		//-------------------------------------------------------------------------------------------------------------
+		"precache"
+		{
+			"soundfile"			"soundevents/game_sounds_heroes/game_sounds_venomancer.vsndevts"
+			"particle"			"particles/units/heroes/hero_venomancer/venomancer_poison_nova.vpcf"
+			"particle"			"particles/units/heroes/hero_venomancer/venomancer_poison_debuff_nova.vpcf"
+			"particle"			"particles/units/heroes/hero_venomancer/venomancer_poison_nova_cast.vpcf"
+		}
+	
+		// Casting
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCastPoint"				"0.0 0.0 0.0"
+	
+		// Time		
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCooldown"				"125.0 100.0 75.0"
+	
+		// Cost
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityManaCost"				"250 500 750"		
+	
+		// Stats
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityModifierSupportValue"	"0.0"	// just does damage
+	
+		// Special
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"					"FIELD_INTEGER"
+				"radius"					"800 1000 1200"
+			}
+			"02"
+			{
+				"var_type"					"FIELD_INTEGER"
+				"start_radius"				"200 300 400"
+			}
+			"03"
+			{
+				"var_type"					"FIELD_FLOAT"
+				"duration"					"10.0 15.0 20.0"
+			}
+			"04"
+			{
+				"var_type"					"FIELD_INTEGER"
+				"damage"					"50 75 100"
+			}
+			"05"
+			{
+				"var_type"					"FIELD_FLOAT"
+				"cooldown_scepter"			"140.0 120.0 60.0"
+			}
+			"06"
+			{
+				"var_type"					"FIELD_FLOAT"
+				"duration_scepter"			"14.0 15.0 16.0"
+			}
+			"07"
+			{
+				"var_type"					"FIELD_INTEGER"
+				"damage_scepter"			"58 81 108"
+			}
+			"08"
+			{
+				"var_type"					"FIELD_INTEGER"
+				"speed"						"300 600 900"
+			}
+		}
+	
+		"OnSpellStart"
+		{
+			"FireSound"
+			{
+				"EffectName"	"Hero_Venomancer.PoisonNova"
+				"Target"		"CASTER"
+			}
+	
+			"FireEffect"
+			{
+				"EffectName"	"particles/units/heroes/hero_venomancer/venomancer_poison_nova_cast.vpcf"
+				"EffectAttachType"	"attach_origin"
+				"Target"		"CASTER"
+			}
+	
+			"FireEffect"
+			{
+				"EffectName"	"particles/units/heroes/hero_venomancer/venomancer_poison_nova.vpcf"
+				"EffectAttachType"	"start_at_customorigin"
+				
+				"ControlPointEntities"
+				{
+					"CASTER"	"attach_origin"
+				}
+	
+				"ControlPoints"
+				{
+					"01"	"1 1 1"
+					"02"	"0 0 0"
+				}
+			}
+	
+			"ActOnTargets"
+			{
+				"Target"
+				{
+					"Center"	"CASTER"
+					"Radius"	"%radius"
+					"Teams"		"DOTA_UNIT_TARGET_TEAM_ENEMY"
+					"Types"		"DOTA_UNIT_TARGET_BASIC | DOTA_UNIT_TARGET_HERO"
+				}
+	
+				"Action"
+				{
+					"ApplyModifier"
+					{
+						"ModifierName"		"modifier_poison_nova_debuff_datadriven"
+						"Target"			"TARGET"
+						"Duration"			"%duration"
+					}
+				}
+			}
+		}
+	
+		"Modifiers"
+		{
+			"modifier_poison_nova_debuff_datadriven"
+			{
+				"IsDebuff"	"1"
+				"IsPurgable"	"0"			
+	
+				"EffectName"	"particles/units/heroes/hero_venomancer/venomancer_poison_debuff_nova.vpcf"
+				"EffectAttachType"	"follow_origin"
+	
+				"ThinkInterval"	"1.0"
+				"OnIntervalThink"
+				{
+					"RunScript"
+					{
+						"ScriptFile"	"scripts/vscripts/heroes/hero_venomancer/poison_nova.lua"
+						"Function"		"PoisonNova"
+						"Target"		"TARGET"
+					}
+				}
+	
+				"OnCreated"
+				{
+					"FireSound"
+					{
+						"EffectName"	"Hero_Venomancer.PoisonNovaImpact"
+						"Target"		"TARGET"
+					}
+	
+					"RunScript"
+					{
+						"ScriptFile"	"scripts/vscripts/heroes/hero_venomancer/poison_nova.lua"
+						"Function"		"PoisonNova"
+						"Target"		"TARGET"
+					}
+				}
+			}
+		}
+	}
+//==================================================================================================
+// veno poison sting
+//==================================================================================================
+	// Rewrite of the Venomancer Poison Sting ability
+	// Author: Pizzalol and Rook
+	// Date: 22.12.2014.
+	// Known bugs:
+	//     The Plague Ward interaction with Poison Sting is hardcoded in modifier_poison_sting_debuff_datadriven_on_destroy().
+	//         This can be fixed once we are able to determine the caster of a modifier.
+	"venomancer_op_poison_sting_datadriven"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"BaseClass"						"ability_datadriven"
+		"AbilityType"					"DOTA_ABILITY_TYPE_BASIC"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
+		"AbilityUnitDamageType"			"DAMAGE_TYPE_MAGICAL"	
+		"SpellImmunityType"				"SPELL_IMMUNITY_ENEMIES_YES"
+		"AbilityTextureName"			"venomancer_poison_sting"
+		
+		// Special
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"				"FIELD_FLOAT"
+				"duration"				"5.0 10.0 15.0 20.0"
+			}
+			"02"
+			{
+				"var_type"					"FIELD_INTEGER"
+				"damage"					"10 20 30 40"
+			}
+			"03"
+			{
+				"var_type"					"FIELD_INTEGER"
+				"movement_speed"			"-10 -15 -20 -25"
+			}			
+		}
+	
+		"Modifiers"
+		{
+			"modifier_poison_sting_datadriven"
+			{
+				"Passive"	"1"
+				"IsHidden"	"1"
+	
+				"OnAttackLanded"
+				{
+					"ApplyModifier"
+					{
+						"ModifierName"	"modifier_poison_sting_debuff_datadriven"
+						"Target"		"TARGET"
+					}
+				}
+			}
+	
+			"modifier_poison_sting_debuff_datadriven"
+			{
+				"IsDebuff"	"1"
+				"Duration"	"%duration"
+	
+				"ThinkInterval"	"1.0"
+	
+				"OnIntervalThink"
+				{
+					"Damage"
+					{
+						"Target"	"TARGET"
+						"Type"		"DAMAGE_TYPE_MAGICAL"
+						"Damage"	"%damage"
+					}
+				}
+	
+				"OnCreated"
+				{
+					"Damage"
+					{
+						"Target"	"TARGET"
+						"Type"		"DAMAGE_TYPE_MAGICAL"
+						"Damage"	"%damage"
+					}
+					
+					"RunScript"
+					{
+						"ScriptFile"		"heroes/hero_venomancer/poison_sting.lua"
+						"Function"			"modifier_poison_sting_debuff_datadriven_on_created"
+					}
+				}
+				
+				"OnDestroy"
+				{
+					"RunScript"
+					{
+						"ScriptFile"		"heroes/hero_venomancer/poison_sting.lua"
+						"Function"			"modifier_poison_sting_debuff_datadriven_on_destroy"
+					}
+				}
+				
+				"Properties"
+				{
+					"MODIFIER_PROPERTY_MOVESPEED_BONUS_PERCENTAGE"		"%movement_speed"
+				}
+			}
+		}
+	}
+	
+//==================================================================================================
+// veno gale
+//==================================================================================================
+	
+	
+	// Rewrite of the Venomancer Venomous Gale ability
+	// Author: Pizzalol
+	// Date: 30.09.2015.
+	"venomancer_op_venomous_gale_datadriven"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"BaseClass"				"ability_datadriven"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_AOE | DOTA_ABILITY_BEHAVIOR_POINT"
+		"AbilityUnitDamageType"			"DAMAGE_TYPE_MAGICAL"	
+		"SpellImmunityType"				"SPELL_IMMUNITY_ENEMIES_NO"
+		"FightRecapLevel"				"1"
+		"AbilityTextureName"			"venomancer_venomous_gale"
+	
+		// Precache
+		//-------------------------------------------------------------------------------------------------------------
+		"precache"
+		{
+			"soundfile"			"soundevents/game_sounds_heroes/game_sounds_venomancer.vsndevts"
+			"particle"			"particles/units/heroes/hero_venomancer/venomancer_venomous_gale.vpcf"
+			"particle"			"particles/units/heroes/hero_venomancer/venomancer_gale_poison_debuff.vpcf"
+		}
+	
+		// Casting
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCastRange"				"1200"
+		"AbilityCastPoint"				"0.0 0.0 0.0 0.0"
+	
+		// Time		
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCooldown"				"25.0 20.0 15.0 10.0"
+		
+		// Cost
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityManaCost"				"50 100 150 200"
+		
+		// Special	
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"				"FIELD_FLOAT"
+				"duration"				"25.0 20.0 15.0 10.0"
+			}
+			"02"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"strike_damage"			"75 100 125 150"
+			}
+			"03"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"tick_damage"			"20 40 60 80"
+			}
+			"04"
+			{
+				"var_type"				"FIELD_FLOAT"
+				"tick_interval"			"4.0 3.0 2.0 1.0"
+			}
+			"05"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"movement_slow"			"-30 -40 -50 -60"
+			}
+			"06"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"radius"				"75 100 125 150"
+			}
+			"07"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"speed"					"1100 1000 900 800"
+			}
+			"08"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"distance"					"750 850 950 1050"
+			}
+		}
+	
+		"OnSpellStart"
+		{
+			"FireSound"
+			{
+				"EffectName"	"Hero_Venomancer.VenomousGale"
+				"Target"		"CASTER"
+			}
+	
+			"LinearProjectile"
+			{
+				"Target"      "POINT"
+			    "EffectName"  "particles/units/heroes/hero_venomancer/venomancer_venomous_gale.vpcf"
+			    "MoveSpeed"   "%speed"
+			    "StartRadius"   "%radius"
+			    "StartPosition" "attach_origin"
+			    "EndRadius"     "%radius"
+			    "FixedDistance" "%distance"
+			    "TargetTeams"   "DOTA_UNIT_TARGET_TEAM_ENEMY"
+			    "TargetTypes"   "DOTA_UNIT_TARGET_BASIC | DOTA_UNIT_TARGET_HERO"
+			    "TargetFlags"   "DOTA_UNIT_TARGET_FLAG_NONE"
+			    "HasFrontalCone"    "0"
+			    "ProvidesVision" "0"
+			}
+		}
+	
+		"OnProjectileHitUnit"
+		{
+			"DeleteOnHit"	"0"
+	
+			"FireSound"
+			{
+				"EffectName"	"Hero_Venomancer.VenomousGaleImpact"
+				"Target"		"TARGET"
+			}
+	
+			"Damage"
+			{
+				"Target"	"TARGET"
+				"Type"		"DAMAGE_TYPE_MAGICAL"
+				"Damage"	"%strike_damage"
+			}		
+	
+			"RunScript"
+			{
+				"ScriptFile"	"heroes/hero_venomancer/venomous_gale.lua"
+				"Function"		"VenomousGaleImpact"
+				"modifier"		"modifier_venomous_gale_debuff_datadriven"
+			}	
+		}
+	
+		"Modifiers"
+		{
+			"modifier_venomous_gale_debuff_datadriven"
+			{
+				"IsDebuff"	"1"			
+	
+				"EffectName"	"particles/units/heroes/hero_venomancer/venomancer_gale_poison_debuff.vpcf"
+				"EffectAttachType"	"follow_origin"
+	
+				"ThinkInterval"		"%tick_interval"
+				"OnIntervalThink"
+				{
+					"Damage"
+					{
+						"Target"	"TARGET"
+						"Type"		"DAMAGE_TYPE_MAGICAL"
+						"Damage"	"%tick_damage"
+					}
+				}
+	
+				"Properties"
+				{
+					"MODIFIER_PROPERTY_MOVESPEED_BONUS_PERCENTAGE"	"-1"
+				}
+			}
+		}
+	}
+	
+
+	
+	
+	
+	
+	
+	
+	
+	
+	
+//==================================================================================================
+// Omni degen
+//==================================================================================================
+	
+	
+	
+		
+	// Rewrite of Omniknight Degen Aura
+	// Author: Noya
+	// Date: 8.1.2015.
+	// Notes: -
+	"omniknight_op_degen_aura_datadriven"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"BaseClass"				"ability_datadriven"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE | DOTA_ABILITY_BEHAVIOR_AURA"
+		"AbilityUnitTargetTeam"			"DOTA_UNIT_TARGET_TEAM_ENEMY"
+		"SpellImmunityType"				"SPELL_IMMUNITY_ENEMIES_YES"
+		"AbilityTextureName"			"omniknight_degen_aura"
+		
+		// Casting
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCastRange"				"750"
+		
+		// Special
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"speed_bonus"			"-20 -30 -40 -50"
+			}
+			"02"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"attack_bonus_tooltip"	"-20 -30 -40 -50"
+			}
+			"03"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"radius"				"750"
+			}
+		}
+	
+		"precache"
+		{
+			"soundfile"	"soundevents/game_sounds_heroes/game_sounds_omniknight.vsndevts"
+			"particle"	"particles/units/heroes/hero_omniknight/omniknight_degen_aura_debuff.vpcf"
+		}
+	
+		"Modifiers"
+		{
+			"modifier_degen_aura"
+			{
+				"Passive" 			"1"
+				"IsHidden" 			"1"
+				"IsBuff"			"1"
+	
+				"Aura" 				"modifier_degen_aura_effect"
+				"Aura_Radius" 		"%radius"
+				"Aura_Teams" 		"DOTA_UNIT_TARGET_TEAM_ENEMY"
+				"Aura_Types" 		"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC | DOTA_UNIT_TARGET_MECHANICAL"
+			}
+	
+			"modifier_degen_aura_effect"
+			{
+				"IsDebuff"			"1"
+				"EffectName"		"particles/units/heroes/hero_omniknight/omniknight_degen_aura_debuff.vpcf"
+				"EffectAttachType"	"follow_origin"
+				"Properties"
+				{
+					"MODIFIER_PROPERTY_MOVESPEED_BONUS_PERCENTAGE"	"%speed_bonus"
+					"MODIFIER_PROPERTY_ATTACKSPEED_BONUS_CONSTANT"	"%attack_bonus_tooltip"
+				}
+			}
+	
+		}
+	
+	
+	}
+//==================================================================================================
+// Omni guardian angel
+//==================================================================================================
+
+	// Rewrite of Omniknight Guardian Angel
+	// Author: Noya
+	// Date: 8.1.2015.
+	// Notes: -
+	"omniknight_op_guardian_angel_datadriven"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"BaseClass"					"ability_datadriven"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+		"AbilityType"					"DOTA_ABILITY_TYPE_ULTIMATE"
+		"SpellImmunityType"				"SPELL_IMMUNITY_ALLIES_YES"
+		"FightRecapLevel"				"2"
+		"AbilityTextureName"			"omniknight_guardian_angel"
+	
+		// Time		
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCooldown"				"150.0 100.0 50.0"
+		"AbilityCastPoint"				"0.0 0.0 0.0"
+		
+		// Cost
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityManaCost"				"200 300 400"
+		
+		// Special
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"					"FIELD_FLOAT"
+				"duration"					"6.0 8.0 10.0"
+			}
+			"02"
+			{
+				"var_type"					"FIELD_INTEGER"
+				"radius"					"1000 1500 2000"
+			}
+			"03"
+			{
+				"var_type"					"FIELD_FLOAT"
+				"duration_scepter"			"5.0 10.0 20.0"
+			}
+		}
+	
+		"precache"
+		{
+			"soundfile"	"soundevents/game_sounds_heroes/game_sounds_omniknight.vsndevts"
+			"particle"	"particles/units/heroes/hero_omniknight/omniknight_guardian_angel_halo_buff.vpcf"
+			"particle"  "particles/status_fx/status_effect_guardian_angel.vpcf"
+			"particle"  "particles/units/heroes/hero_omniknight/omniknight_guardian_angel_ally.vpcf"
+		}
+	
+		"OnSpellStart"
+		{
+			"FireSound"
+			{
+				"EffectName"	"Hero_Omniknight.GuardianAngel.Cast"
+				"Target"		"CASTER"
+			}
+	
+			"ActOnTargets"
+			{
+				"Target"
+				{
+					"Center"  		"CASTER"
+					"Radius"		"%radius"
+					"Teams" 		"DOTA_UNIT_TARGET_TEAM_FRIENDLY"
+					"Types" 		"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
+				}
+	
+				"Action"
+				{
+					"ApplyModifier"
+					{
+						"Target" 		"TARGET"
+						"ModifierName"	"modifier_guardian_angel"
+					}
+				}
+			}
+		}
+	
+		"Modifiers"
+		{
+			"modifier_guardian_angel"
+			{
+				"IsBuff"			"1"
+				"IsPurgable"		"1"
+				"Duration"			"%duration"
+				"StatusEffectName"     "particles/status_fx/status_effect_guardian_angel.vpcf"
+				"StatusEffectPriority" "10"
+	
+				"OnCreated"
+				{
+					"AttachEffect"
+					{
+						"EffectName"		"particles/units/heroes/hero_omniknight/omniknight_guardian_angel_halo_buff.vpcf"
+						"EffectAttachType"	"follow_overhead"
+						"Target"			"CASTER"
+					}
+	
+				 	"AttachEffect"
+					{
+						"Target"
+						{
+							"Center"  		"CASTER"
+							"Radius"		"%radius"
+							"Teams" 		"DOTA_UNIT_TARGET_TEAM_FRIENDLY"
+							"Types" 		"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
+						}
+						"EffectName"				"particles/units/heroes/hero_omniknight/omniknight_guardian_angel_ally.vpcf"
+						"EffectAttachType"			"follow_origin"
+						"EffectRadius"				"%radius"
+					}
+				}
+	
+				"Properties"
+				{
+					"MODIFIER_PROPERTY_ABSOLUTE_NO_DAMAGE_PHYSICAL"	"1"
+				}
+			}
+		}
+	}
+
 	//==================================================================================================
-	// QoP Sonic blink
+	// Omni purification
+	//==================================================================================================
+
+	
+	// Rewrite of Omniknight Purification
+	// Author: Noya
+	// Date: 8.1.2015.
+	// Notes: The Heal shows a green popup. To get rid of this just use the Lua version of Heal.
+	"omniknight_op_purification_datadriven"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"BaseClass"				"ability_datadriven"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_UNIT_TARGET"
+		"AbilityUnitTargetTeam"			"DOTA_UNIT_TARGET_TEAM_FRIENDLY"
+		"AbilityUnitTargetType"			"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC | DOTA_UNIT_TARGET_MECHANICAL"
+		"AbilityUnitTargetFlags"		"DOTA_UNIT_TARGET_FLAG_NOT_MAGIC_IMMUNE_ALLIES"
+		"AbilityUnitDamageType"			"DAMAGE_TYPE_PURE"
+		"SpellImmunityType"				"SPELL_IMMUNITY_ALLIES_NO"
+		"FightRecapLevel"				"1"
+		"AbilityTextureName"			"omniknight_purification"
+	
+		// Casting
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCastRange"				"1000"
+		"AbilityCastPoint"				"0.6 0.4 0.2 0.0"
+		
+		// Time		
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCooldown"				"12 9 6 3"
+		
+		// Cost
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityManaCost"				"50 100 150 200"
+		
+		// Special
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"heal"					"100 200 300 400"
+			}
+			"02"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"radius"				"500"
+			}
+		}
+	
+		"precache"
+		{
+			"soundfile"	"soundevents/game_sounds_heroes/game_sounds_omniknight.vsndevts"
+			"particle"	"particles/units/heroes/hero_omniknight/omniknight_purification.vpcf"
+			"particle"	"particles/units/heroes/hero_omniknight/omniknight_purification_hit.vpcf"
+			"particle"	"particles/units/heroes/hero_omniknight/omniknight_purification_cast.vpcf"
+	
+		}
+	
+		"OnSpellStart"
+		{
+			"FireSound"
+			{
+				"EffectName"	"Hero_Omniknight.Purification"
+				"Target"		"TARGET"
+			}
+	
+			"FireEffect"
+			{
+				"Target"			"TARGET"
+				"EffectName"		"particles/units/heroes/hero_omniknight/omniknight_purification.vpcf"
+				"EffectAttachType"	"follow_origin"
+				"ControlPoints"
+				{
+					"00"	"0 0 0"
+					"01"	"%radius %radius %radius"
+				}
+			}
+			
+			"FireEffect"
+			{
+				"Target"			"TARGET"
+				"EffectName"		"particles/units/heroes/hero_omniknight/omniknight_purification_cast.vpcf"
+				"EffectAttachType"	"follow_origin"
+			}
+	
+			"Heal"
+			{
+				"Target" 		"TARGET"
+				"HealAmount"	"%heal"
+			}
+	
+			"ActOnTargets"
+			{
+				"Target"
+				{
+					"Center"  			"TARGET"
+					"Radius"			"%radius"
+					"Teams" 			"DOTA_UNIT_TARGET_TEAM_ENEMY"
+					"Types" 			"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
+				}
+	
+				"Action"
+				{
+					"Damage"
+					{
+						"Target"		 "TARGET"
+						"Type"			 "DAMAGE_TYPE_PURE"
+						"Damage"		 "%heal"
+					}
+					"FireEffect"
+					{
+						"Target"			"TARGET"
+						"EffectName"		"particles/units/heroes/hero_omniknight/omniknight_purification_hit.vpcf"
+						"EffectAttachType"	"follow_origin"
+					}
+				}
+			}
+		}
+	}
+	
+	//==================================================================================================
+	// Omni Repel
+	//==================================================================================================
+
+	
+	// Rewrite of Omniknight Repel
+	// Author: Noya
+	// Date: 8.1.2015.
+	// Notes: Will need to be changed to 100% Magic Resistance and "Spell Immunity" when the tools get updated to 6.82
+	//		  The Purge interaction is incorrect for item_diffusal_blade which can't target a State Magic Immune unit
+	//		  Sound plays for the full duration on every level
+	"omniknight_op_repel_datadriven"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"BaseClass"				"ability_datadriven"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_UNIT_TARGET"
+		"AbilityUnitTargetTeam"			"DOTA_UNIT_TARGET_TEAM_BOTH"
+		"AbilityUnitTargetType"			"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC | DOTA_UNIT_TARGET_MECHANICAL"
+		"SpellImmunityType"				"SPELL_IMMUNITY_ALLIES_NO"
+		"FightRecapLevel"				"1"
+		"AbilityTextureName"			"omniknight_repel"
+	
+		// Casting
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCastRange"				"1500"
+		"AbilityCastPoint"				"0.6 0.4 0.2 0.0"
+		
+		// Time		
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCooldown"				"5 10 15 20"
+		
+		// Cost
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityManaCost"				"50 50 50 50"
+	
+		// Stats
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityModifierSupportValue"	"3.0"	// Value much higher than cost.
+	
+		
+		// Special
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"				"FIELD_FLOAT"
+				"duration"				"2.5 5 7.5 10"
+			}
+		}
+	
+		"precache"
+		{
+			"soundfile"	"soundevents/game_sounds_heroes/game_sounds_omniknight.vsndevts"
+			"particle"	"particles/units/heroes/hero_omniknight/omniknight_repel_buff.vpcf"
+		}
+	
+		"OnSpellStart"
+		{
+			"FireSound"
+			{
+				"EffectName"		"Hero_Omniknight.Repel"
+				"Target"			"TARGET"
+			}
+	
+			"FireEffect"
+			{
+				"EffectName"		"particles/units/heroes/hero_omniknight/omniknight_repel_cast.vpcf"
+				"EffectAttachType"  "follow_origin"
+				"Target"            "TARGET"
+			}
+	
+			"ApplyModifier"
+			{
+				"Target" 			"TARGET"
+				"ModifierName"		"modifier_repel_datadriven"
+			}
+		}
+	
+		"Modifiers"
+		{
+			"modifier_repel_datadriven"
+			{
+				"IsBuff"		"1"
+				"IsPurgable"	"1"
+				"Duration"		"%duration"
+				"EffectName"		"particles/units/heroes/hero_omniknight/omniknight_repel_buff.vpcf"
+				"EffectAttachType"	"follow_origin"
+				"States"
+				{
+					"MODIFIER_STATE_MAGIC_IMMUNE"	"MODIFIER_STATE_VALUE_ENABLED"
+				}
+			}
+		}
+	}
+	
+
+	
+	
+	
+	
+	
+	
+	
+	
+	//==================================================================================================
+	// Lina dragon slave
+	//==================================================================================================
+
+
+	// Rewrite of the Lina Dragon Slave ability
+	// Author: Pizzalol
+	// Date: 29.12.2014.
+	"lina_op_dragon_slave_datadriven"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"BaseClass"				"ability_datadriven"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_UNIT_TARGET | DOTA_ABILITY_BEHAVIOR_POINT"
+		"AbilityUnitTargetTeam"			"DOTA_UNIT_TARGET_TEAM_ENEMY"
+		"AbilityUnitTargetType"			"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
+		"AbilityUnitDamageType"			"DAMAGE_TYPE_MAGICAL"	
+		"SpellImmunityType"				"SPELL_IMMUNITY_ENEMIES_NO"
+		"FightRecapLevel"				"1"
+		"AbilityTextureName"			"lina_dragon_slave"
+	
+		// Precache
+		//-------------------------------------------------------------------------------------------------------------
+		"precache"
+		{
+			"soundfile"			"soundevents/game_sounds_heroes/game_sounds_lina.vsndevts"
+			"particle"			"particles/units/heroes/hero_lina/lina_spell_dragon_slave.vpcf"
+		}
+		
+		// Casting
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCastRange"				"800 900 1000 1100"
+		"AbilityCastPoint"				"0.8 0.6 0.2 0.0"
+	
+		// Time		
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCooldown"				"9 8 7 6"
+		"AbilityDuration"				"0.8 0.6 0.2 0.0"
+	
+		// Damage.
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityDamage"					"200 250 300 350"
+	
+		// Cost
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityManaCost"				"100 130 160 200"
+	
+		// Special
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"					"FIELD_INTEGER"
+				"dragon_slave_speed"		"1200"
+			}
+			
+			"02"
+			{
+				"var_type"					"FIELD_INTEGER"
+				"dragon_slave_width_initial"	"275"
+			}
+			"03"
+			{
+				"var_type"					"FIELD_INTEGER"
+				"dragon_slave_width_end"		"200"
+			}
+			
+			"04"
+			{
+				"var_type"					"FIELD_INTEGER"
+				"dragon_slave_distance"			"1000 1100 1200 1300"
+			}
+		}
+	
+		"OnSpellStart"
+		{
+			"LinearProjectile"
+			{
+				"Target"      "POINT"
+			    "EffectName"  "particles/units/heroes/hero_lina/lina_spell_dragon_slave.vpcf"
+			    "MoveSpeed"   "%dragon_slave_speed"
+			    "StartRadius"   "%dragon_slave_width_initial"
+			    "StartPosition" "attach_origin"
+			    "EndRadius"     "%dragon_slave_width_end"
+			    "FixedDistance" "%dragon_slave_distance"
+			    "TargetTeams"   "DOTA_UNIT_TARGET_TEAM_ENEMY"
+			    "TargetTypes"   "DOTA_UNIT_TARGET_BASIC | DOTA_UNIT_TARGET_HERO"
+			    "TargetFlags"   "DOTA_UNIT_TARGET_FLAG_NONE"
+			    "HasFrontalCone"    "1"
+			    "ProvidesVision" "0"
+			}
+	
+			"FireSound"
+			{
+				"EffectName"	"Hero_Lina.DragonSlave"
+				"Target"		"CASTER"
+			}
+		}
+	
+		"OnProjectileHitUnit"
+		{
+			"DeleteOnHit"	"0"
+			"Damage"
+			{
+				"Target"	"TARGET"
+				"Type"		"DAMAGE_TYPE_MAGICAL"
+				"Damage"	"%AbilityDamage"
+			}
+		}
+	}
+	
+//	"lina_fiery_soul_alt1_datadriven"
+//	{
+//	    // General
+//	    //-------------------------------------------------------------------------------------------------------------
+//		"BaseClass"                    "ability_datadriven" 
+//	    "AbilityBehavior"               ""
+//	    "AbilityType"                   ""
+//	    "SpellImmunityType"             ""
+//	    "AbilityTextureName"            ""
+//	
+//	    // Precache
+//	    //-------------------------------------------------------------------------------------------------------------
+//	    "precache"
+//	    {
+//	
+//	    }
+//	
+//	    // Casting
+//	    //-------------------------------------------------------------------------------------------------------------
+//	    "AbilityCastPoint"              ""
+//	    "AbilityCastRange"              ""
+//	
+//	    // Time
+//	    //-------------------------------------------------------------------------------------------------------------
+//	    "AbilityCooldown"               ""
+//	
+//	    // Cost
+//	    //-------------------------------------------------------------------------------------------------------------
+//	    "AbilityManaCost"               ""
+//	
+//	    // Damage
+//	    //-------------------------------------------------------------------------------------------------------------
+//	    "AbilityDamage"                 ""
+//	
+//	    // Special
+//	    //-------------------------------------------------------------------------------------------------------------
+//	    "AbilitySpecial"
+//	    {
+//	
+//	    }
+//	}
+
+	//==================================================================================================
+	// Lina fiery
+	//==================================================================================================
+
+
+
+	// Rewrite of the Lina Fiery Soul ability
+	// Author: Pizzalol
+	// Date: 30.12.2014.
+	// NOTE: Works with items
+	"lina_op_fiery_soul_datadriven"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"BaseClass"				"ability_datadriven"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
+		"AbilityTextureName"			"lina_fiery_soul"
+		
+		// Casting
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityDuration"				"10"
+		
+		// Special
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"					"FIELD_INTEGER"
+				"fiery_soul_attack_speed_bonus"	"40 55 70 85"
+			}
+			"02"
+			{
+				"var_type"					"FIELD_INTEGER"
+				"fiery_soul_move_speed_bonus"	"5 6 7 8"
+			}
+			"03"
+			{
+				"var_type"					"FIELD_INTEGER"
+				"fiery_soul_max_stacks"		"10"
+			}
+		}
+	
+	
+		"Modifiers"
+		{
+			"modifier_fiery_soul_datadriven"
+			{
+				"Passive"	"1"
+				"IsHidden"	"1"
+	
+				"OnAbilityExecuted"
+				{
+					"RunScript"
+					{
+						"ScriptFile"	"scripts/vscripts/heroes/hero_lina/fiery_soul.lua"
+						"Function"		"FierySoul"
+					}
+				}
+			}
+	
+			"modifier_fiery_soul_buff_stack_datadriven"
+			{
+				"Duration"	"%AbilityDuration"
+				"IsBuff"	"1"
+			}
+	
+			"modifier_fiery_soul_buff_datadriven"
+			{
+				"IsHidden"		"1"
+				"Duration"		"%AbilityDuration"
+	
+				"Attributes"	"MODIFIER_ATTRIBUTE_MULTIPLE"
+	
+				"Properties"
+				{
+					"MODIFIER_PROPERTY_ATTACKSPEED_BONUS_CONSTANT"	"%fiery_soul_attack_speed_bonus"
+					"MODIFIER_PROPERTY_MOVESPEED_BONUS_PERCENTAGE"	"%fiery_soul_move_speed_bonus"
+				}
+			}
+		}
+	}
+	
+	//==================================================================================================
+	// Lina laguna
+	//==================================================================================================
+
+	
+	
+	// Rewrite of the Lina Light Strike Array ability
+	// Author: Pizzalol
+	// Date: 30.12.2014.
+	// Changed: 09.01.2015.
+	// Reason: Changed the damage from delayed action to a modifier
+	"lina_op_laguna_blade_datadriven"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"BaseClass"				"ability_datadriven"
+		"AbilityType"					"DOTA_ABILITY_TYPE_ULTIMATE"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_UNIT_TARGET"
+		"AbilityUnitTargetTeam"			"DOTA_UNIT_TARGET_TEAM_ENEMY"
+		"AbilityUnitTargetType"			"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
+		"AbilityUnitTargetFlags"		"DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES"
+		"SpellImmunityType"				"SPELL_IMMUNITY_ENEMIES_NO"							// Changes dynamically with scepter	
+		"AbilityUnitDamageType"			"DAMAGE_TYPE_MAGICAL"	
+		"FightRecapLevel"				"2"
+		"AbilityTextureName"			"lina_laguna_blade"
+	
+		// Precache
+		//-------------------------------------------------------------------------------------------------------------
+		"precache"
+		{
+			"soundfile"			"soundevents/game_sounds_heroes/game_sounds_lina.vsndevts"
+			"particle"			"particles/units/heroes/hero_lina/lina_spell_laguna_blade.vpcf"
+		}
+		
+		// Casting
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCastRange"				"600 1000 1400"
+		"AbilityCastPoint"				"0.0 0.0 0.0"
+	
+		// Time		
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCooldown"				"60.0 50.0 40.0"
+	
+		// Cost
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityManaCost"				"250 500 999"
+			
+		// Stats
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityModifierSupportValue"	"0.0"	// Modifier just delays damage
+	
+		// Special
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"					"FIELD_INTEGER"
+				"damage"					"600 1200 1800"
+			}
+			"02"
+			{
+				"var_type"					"FIELD_INTEGER"
+				"cast_range_scepter"		"800 1400 1800"
+			}
+			"03"
+			{
+				"var_type"					"FIELD_FLOAT"
+				"damage_delay"				"0.0"
+			}
+		}
+	
+		"OnSpellStart"
+		{
+			"FireSound"
+			{
+				"EffectName"	"Ability.LagunaBladeImpact"
+				"Target"		"TARGET"
+			}
+	
+			"FireSound"
+			{
+				"EffectName"	"Ability.LagunaBlade"
+				"Target"		"CASTER"
+			}
+	
+			"FireEffect"
+			{
+				"EffectName"	"particles/units/heroes/hero_lina/lina_spell_laguna_blade.vpcf"
+				"EffectAttachType"	"start_at_customorigin"
+				
+	
+				"ControlPointEntities"
+				{
+					"CASTER"	"attach_attack1"
+					"TARGET"	"attach_hitloc"
+				}
+			}
+	
+			"ApplyModifier"
+			{
+				"ModifierName"		"modifier_laguna_blade_datadriven"
+				"Target"			"TARGET"
+			}
+		}
+	
+		"Modifiers"
+		{
+			"modifier_laguna_blade_datadriven"
+			{
+				"IsHidden"	"1"
+				"Duration"	"%damage_delay"
+	
+				"OnDestroy"
+				{
+					"Damage"
+					{
+						"Target"	"TARGET"
+						"Type"		"DAMAGE_TYPE_MAGICAL"
+						"Damage"	"%damage"
+					}
+				}
+			}
+		}
+	}
+	
+	//==================================================================================================
+	// Lina Light strike
+	//==================================================================================================
+	
+	// Rewrite of the Lina Light Strike Array ability
+	// Author: Pizzalol
+	// Date: 29.12.2014.
+	"lina_op_light_strike_array_datadriven"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"BaseClass"				"ability_datadriven"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_POINT | DOTA_ABILITY_BEHAVIOR_AOE"
+		"AbilityUnitDamageType"			"DAMAGE_TYPE_MAGICAL"	
+		"SpellImmunityType"				"SPELL_IMMUNITY_ENEMIES_NO"
+		"FightRecapLevel"				"1"
+		"AbilityTextureName"			"lina_light_strike_array"
+		
+		"AbilityCastRange"				"600 700 800 900"
+		"AbilityCastPoint"				"0.6 0.4 0.2 0.0"
+		"AOERadius"						"%light_strike_array_aoe"
+	
+		// Precache
+		//-------------------------------------------------------------------------------------------------------------
+		"precache"
+		{
+			"soundfile"			"soundevents/game_sounds_heroes/game_sounds_lina.vsndevts"
+			"particle"			"particles/units/heroes/hero_lina/lina_spell_light_strike_array.vpcf"
+			"particle"			"particles/units/heroes/hero_lina/lina_spell_light_strike_array_ray_team.vpcf"
+			"particle"			"particles/generic_gameplay/generic_stunned.vpcf"
+		}
+		
+		// Time		
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCooldown"				"8.0 7.0 6.0 5.0"
+		"AbilityDuration"				"4.0 3.5 3.0 2.5"
+	
+		// Damage.
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityDamage"					"200 250 300 350"
+	
+		// Cost
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityManaCost"				"100 30 60 200"
+	
+		// Special
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"					"FIELD_INTEGER"
+				"light_strike_array_aoe"	"400"
+			}
+			
+			"02"
+			{
+				"var_type"						"FIELD_FLOAT"
+				"light_strike_array_delay_time"	"0.1"
+			}
+						
+			"03"
+			{
+				"var_type"						"FIELD_FLOAT"
+				"light_strike_array_stun_duration"	"4.0 3.5 3.0 2.5"
+			}
+		}
+	
+		"OnSpellStart"
+		{
+			"FireSound"
+			{
+				"EffectName"	"Ability.PreLightStrikeArray"
+				"Target"		"CASTER"
+			}
+	
+			"FireEffect"
+			{
+				"EffectName"	"particles/units/heroes/hero_lina/lina_spell_light_strike_array_ray_team.vpcf"
+				"EffectAttachType"	"start_at_customorigin"
+				"TargetPoint"		"POINT"
+	
+				"ControlPoints"
+	            {
+	            	"01"	"%light_strike_array_aoe 0 0"
+	            	"03"	"0 0 0"
+	            }
+			}
+	
+			"DelayedAction"
+			{
+				"Delay"		"%light_strike_array_delay_time"
+	
+				"Action"
+				{
+					"FireSound"
+					{
+						"EffectName"	"Ability.LightStrikeArray"
+						"Target"		"CASTER"
+					}
+	
+					"FireEffect"
+					{
+						"EffectName"	"particles/units/heroes/hero_lina/lina_spell_light_strike_array.vpcf"
+						"EffectAttachType"	"start_at_customorigin"
+						"TargetPoint"		"POINT"
+	
+						"ControlPoints"
+			            {
+			            	"00"	"POINT"
+			            	"01"	"%light_strike_array_aoe 0 0"
+			            	"03"	"0 0 0"
+			            }
+					}
+					
+					"DestroyTrees"
+			        {
+			        	"Target"	"POINT"
+			        	"Radius"	"%light_strike_array_aoe"
+			        }
+	
+					"ActOnTargets"
+					{
+						"Target"
+			            {
+			                "Center" "POINT"
+			                "Radius" "%light_strike_array_aoe"
+			                "Teams" "DOTA_UNIT_TARGET_TEAM_ENEMY" 
+			                "Types" "DOTA_UNIT_TARGET_BASIC | DOTA_UNIT_TARGET_HERO"
+			            }
+	
+			            "Action"
+			            {
+			            	"Damage"
+			            	{
+			            		"Target"	"TARGET"
+			            		"Type"		"DAMAGE_TYPE_MAGICAL"
+			            		"Damage"	"%AbilityDamage"
+			            	}
+	
+			            	"ApplyModifier"
+			            	{
+			            		"ModifierName"	"modifier_light_strike_array_datadriven"
+			            		"Target"		"TARGET"
+			            		"Duration"		"%light_strike_array_stun_duration"
+			            	}		            	
+			            }
+					}				
+				}
+			}
+		}
+	
+		"Modifiers"
+		{
+			"modifier_light_strike_array_datadriven"
+			{
+				"IsDebuff"	"1"
+				"OverrideAnimation"	"ACT_DOTA_DISABLED"
+	
+				"EffectName"	"particles/generic_gameplay/generic_stunned.vpcf"
+				"EffectAttachType"	"follow_overhead"
+	
+				"States"
+				{
+					"MODIFIER_STATE_STUNNED"	"MODIFIER_STATE_VALUE_ENABLED"
+				}
+			}
+		}
+	}
+
+
+
+
+
+
+
+
+
+
+
+
+
+	
+	//==================================================================================================
+	// QoP blink
 	//==================================================================================================
 	
 	// Rewrite of the Queen of Pain Blink ability
@@ -161,7 +1755,7 @@
 		// Casting
 		//-------------------------------------------------------------------------------------------------------------
 		"AbilityCastRange"				"0"
-		"AbilityCastPoint"				"0.3 0.2 0.1 0.0"
+		"AbilityCastPoint"				"0.6 0.4 0.2 0.0"
 	
 		// Time		
 		//-------------------------------------------------------------------------------------------------------------
@@ -169,11 +1763,11 @@
 	
 		// Damage.
 		//-------------------------------------------------------------------------------------------------------------
-		"AbilityDamage"					"100 200 400 800"
+		"AbilityDamage"					"200 300 400 500"
 	
 		// Cost
 		//-------------------------------------------------------------------------------------------------------------
-		"AbilityManaCost"				"100 150 200 250"
+		"AbilityManaCost"				"75 100 125 150"
 	
 		// Special
 		//-------------------------------------------------------------------------------------------------------------
@@ -187,7 +1781,7 @@
 			"02"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"projectile_speed"		"500"
+				"projectile_speed"		"1000"
 			}
 		}
 	
@@ -273,8 +1867,8 @@
 	
 		// Casting
 		//-------------------------------------------------------------------------------------------------------------
-		"AbilityCastRange"				"500 1000 1500 2500"
-		"AbilityCastPoint"				"2.452 1.452 0.452 0.1"
+		"AbilityCastRange"				"250 500 750 1000"
+		"AbilityCastPoint"				"0.0 0.0 0.0 0.1"
 		
 		// Time		
 		//-------------------------------------------------------------------------------------------------------------
@@ -282,7 +1876,7 @@
 	
 		// Cost
 		//-------------------------------------------------------------------------------------------------------------
-		"AbilityManaCost"				"100 200 300 400"
+		"AbilityManaCost"				"75 150 225 300"
 	
 		
 		// Special	
@@ -312,17 +1906,17 @@
 			"05"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"cast_range_tooltip"	"500 1000 1500 2500"
+				"cast_range_tooltip"	"250 500 750 1000"
 			}
 			"06"
 			{
 				"var_type"				"FIELD_INTEGER"
-				"damage_interval"		"1"
+				"damage_interval"		"0.5"
 			}
 			"07"
 			{
 				"var_type"				"FIELD_FLOAT"
-				"duration"				"10.0"
+				"duration"				"7.0"
 			}
 		}
 	
@@ -432,11 +2026,11 @@
 		// Casting
 		//-------------------------------------------------------------------------------------------------------------
 		"AbilityCastRange"				"1000"
-		"AbilityCastPoint"				"1.452 0.452 0.1"
+		"AbilityCastPoint"				"0.0 0.0 0.0"
 	
 		// Time		
 		//-------------------------------------------------------------------------------------------------------------
-		"AbilityCooldown"				"60 120 180"
+		"AbilityCooldown"				"40 50 60"
 	
 		// Cost
 		//-------------------------------------------------------------------------------------------------------------
@@ -520,236 +2114,301 @@
 		}
 	
 	}
-
-	
 	
 	//==================================================================================================
-	// Pudge Dismember
+	// DK Breath
 	//==================================================================================================
-	// Rewrite of the Pudge Dismember ability
-	// Author: Valve
-	// Date: 25.09.2015.
-	"pudge_op_dismember_lua"
+	// Rewrite of the Dragon Knight Breathe Fire
+	// Author: chrislotix
+	// Date: 02.01.2015.
+	
+	"dragon_knight_op_breathe_fire_datadriven"
 	{
 		// General
 		//-------------------------------------------------------------------------------------------------------------
-		"AbilityType"					"DOTA_ABILITY_TYPE_ULTIMATE"
-		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_UNIT_TARGET | DOTA_ABILITY_BEHAVIOR_CHANNELLED | DOTA_ABILITY_BEHAVIOR_IGNORE_BACKSWING"
-		"AbilityUnitTargetTeam"				"DOTA_UNIT_TARGET_TEAM_ENEMY"
-		"AbilityUnitTargetType"			"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
+		"BaseClass"				"ability_datadriven"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_DIRECTIONAL | DOTA_ABILITY_BEHAVIOR_POINT | DOTA_ABILITY_BEHAVIOR_UNIT_TARGET"				   
+		"AbilityUnitTargetTeam"			"DOTA_UNIT_TARGET_TEAM_ENEMY"
+		"AbilityUnitTargetType"			"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"	   
 		"AbilityUnitTargetFlags"		"DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES"
-		"SpellImmunityType"				"SPELL_IMMUNITY_ENEMIES_YES"
+		"SpellImmunityType"				"SPELL_IMMUNITY_ENEMIES_NO"
 		"AbilityUnitDamageType"			"DAMAGE_TYPE_MAGICAL"	
-		"FightRecapLevel"				"2"
-		"BaseClass"						"ability_lua"
-		"AbilityTextureName"					"pudge_dismember"
-		"ScriptFile"						"heroes/hero_pudge/pudge_dismember_lua.lua"
-	
-		// Precache
-		//-------------------------------------------------------------------------------------------------------------
-		"precache"
-		{
-			"soundfile"			"soundevents/game_sounds_heroes/game_sounds_pudge.vsndevts"
-			"particle"			"particles/units/heroes/hero_pudge/pudge_dismember.vpcf"
-		}
-			
-		// Casting
-		//-------------------------------------------------------------------------------------------------------------
-		"AbilityCastRange"				"160"
-		"AbilityCastPoint"				"0.3 0.3 0.3"
-	
-		"AbilityCooldown"				"30.0 30.0 30.0"
-	
-		// Cost
-		//-------------------------------------------------------------------------------------------------------------
-		"AbilityManaCost"				"100 130 170"
-			
-		"AbilitySpecial"
-		{
-			"01"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"dismember_damage"		"100 200 300"
-			}
-			"02"
-			{
-				"var_type"				"FIELD_FLOAT"
-				"strength_damage_scepter"		"2.0"
-			}
-			"03"
-			{
-				"var_type"				"FIELD_FLOAT"
-				"hero_duration"				"5.0"
-			}
-			"04"
-			{
-				"var_type"				"FIELD_FLOAT"
-				"creep_duration"			"10.0"
-			}
-			"05"
-			{
-				"var_type"				"FIELD_FLOAT"
-				"tick_rate"				"0.5"
-			}
-		}
-	}
-	//==================================================================================================
-	// Pudge FleshHeap
-	//==================================================================================================
-	// Rewrite of the Pudge Flesh Heap ability
-	// Author: Valve
-	// Date: 25.09.2015.
-	"pudge_op_flesh_heap_lua"
-	{
-		// General
-		//-------------------------------------------------------------------------------------------------------------
-		"BaseClass"						"ability_lua"
-		"AbilityTextureName"					"pudge_flesh_heap"
-		"ScriptFile"						"heroes/hero_pudge/pudge_flesh_heap_lua.lua"
-		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_PASSIVE"
-	
-		// Precache
-		//-------------------------------------------------------------------------------------------------------------
-		"precache"
-		{
-			"particle"			"particles/units/heroes/hero_pudge/pudge_fleshheap_count.vpcf"
-		}		
-	
-		// Special
-		//-------------------------------------------------------------------------------------------------------------
-		"AbilitySpecial"
-		{
-			"01"
-			{
-				"var_type"						"FIELD_INTEGER"
-				"flesh_heap_magic_resist"		"10 20 30 40"
-			}
-			"02"
-			{
-				"var_type"							"FIELD_FLOAT"
-				"flesh_heap_strength_buff_amount"	"2.5 5 7.5 10"
-			}
-			"03"
-			{
-				"var_type"				"FIELD_INTEGER"
-				"flesh_heap_range"		"1500"
-			}
-		}
-	}
-	//==================================================================================================
-	// Pudge Hook
-	//==================================================================================================
-	// Rewrite of the Pudge Meat Hook ability
-	// Author: Valve
-	// Date: 25.09.2015.
-	"pudge_op_meat_hook_lua"
-	{
-		// General
-		"BaseClass"						"ability_lua"
-		"AbilityTextureName"			"pudge_meat_hook"
-		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_POINT | DOTA_ABILITY_BEHAVIOR_IGNORE_BACKSWING"
-		"AbilityUnitDamageType"			"DAMAGE_TYPE_PURE"	
-		"SpellImmunityType"				"SPELL_IMMUNITY_ENEMIES_YES"
 		"FightRecapLevel"				"1"
-		"ScriptFile"					"heroes/hero_pudge/pudge_meat_hook_lua.lua"	
+		"AbilityTextureName"			"dragon_knight_breathe_fire"
 	
 		// Precache
 		//-------------------------------------------------------------------------------------------------------------
 		"precache"
 		{
-			"soundfile"			"soundevents/game_sounds_heroes/game_sounds_pudge.vsndevts"
-			"particle"			"particles/units/heroes/hero_pudge/pudge_meathook_chain.vpcf"
-			"particle"			"particles/units/heroes/hero_pudge/pudge_meathook_impact.vpcf"
-			"particle"			"particles/units/heroes/hero_pudge/pudge_meathook.vpcf"
+			"soundfile"		"soundevents/game_sounds_heroes/game_sounds_dragon_knight.vsndevts"
+			"particle"		"particles/units/heroes/hero_dragon_knight/dragon_knight_breathe_fire.vpcf"
 		}
-		
+	
+	
 		// Casting
 		//-------------------------------------------------------------------------------------------------------------
-		"AbilityCastRange"				"1000 1750 2250 3000"
-		"AbilityCastPoint"				"1.0 0.6 0.3 0.0"
+		"AbilityCastRange"				"500"
+		"AbilityCastPoint"				"1.0 0.7 0.3 0.0"
 	
 		// Time		
 		//-------------------------------------------------------------------------------------------------------------
-		"AbilityCooldown"				"40 30 20 10"
-	
-	
+		"AbilityCooldown"				"15.0 10.0 5.0 1.0"
+		
+		// Damage.
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityDamage"					"100 200 300 400"
+		
 		// Cost
 		//-------------------------------------------------------------------------------------------------------------
 		"AbilityManaCost"				"100 150 200 250"
-	
+		
+		// Special	
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"start_radius"			"150 150 150 150"
+			}
+			"02"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"end_radius"			"250 250 250 250"
+			}
+			"03"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"range"					"250 500 750 1000"
+			}
+			"04"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"speed"					"650"
+			}
+					
+		}
+		
+		"OnSpellStart"
+		{
+			"LinearProjectile"
+			{
+				"Target" "POINT"
+				"EffectName" "particles/units/heroes/hero_dragon_knight/dragon_knight_breathe_fire.vpcf"
+				"MoveSpeed" "%speed"
+				"StartRadius" "%start_radius"
+				"StartPosition" "attach_origin"
+				"EndRadius" "%end_radius"
+				"FixedDistance" "%range"
+				"TargetTeams" "DOTA_UNIT_TARGET_TEAM_ENEMY"
+				"TargetTypes" "DOTA_UNIT_TARGET_BASIC | DOTA_UNIT_TARGET_HERO | DOTA_UNITY_TARGET_MECHANICAL"
+				"TargetFlags" "DOTA_UNIT_TARGET_FLAG_NONE"
+				"HasFrontalCone" "1"
+				"ProvidesVision" "0"
+			}
+			"FireSound"
+			{
+				"EffectName" "Hero_DragonKnight.BreathFire"
+				"Target" "CASTER"
+			}
+		}
+			"OnProjectileHitUnit"
+			{
+				"DeleteOnHit" "0"
+				"Damage"
+				{
+					"Target" "TARGET"
+					"Type" "DAMAGE_TYPE_MAGICAL"
+					"Damage" "%AbilityDamage"
+				}
+			}
+	}
+	//==================================================================================================
+	// DK dragon blood
+	//==================================================================================================
+	// Rewrite of the Dragon Knight Dragon Blood
+	// Author: chrislotix
+	// Date: 02.01.2015.
+	"dragon_knight_op_dragon_blood_datadriven"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"BaseClass"				"ability_datadriven"
+		"AbilityBehavior"		"DOTA_ABILITY_BEHAVIOR_PASSIVE"
+		"AbilityTextureName"	"dragon_knight_dragon_blood"
+		
 		// Special
 		//-------------------------------------------------------------------------------------------------------------
 		"AbilitySpecial"
 		{
 			"01"
 			{
-				"var_type"				"FIELD_FLOAT"
-				"hook_speed"			"1700.0 1800.0 1900.0 2000.0"
+				"var_type"					"FIELD_INTEGER"
+				"bonus_health_regen"		"5 10 15 20"
 			}
 			"02"
 			{
-				"var_type"			"FIELD_INTEGER"
-				"hook_width"		"75"
+				"var_type"					"FIELD_INTEGER"
+				"bonus_armor"				"10 20 30 40"
 			}
-			"03"
+		}
+		"Modifiers"
+		{
+			"modifier_dragon_blood_datadriven"
 			{
-				"var_type"			"FIELD_INTEGER"
-				"hook_distance"		"1000 1750 2250 3000"
-			}
-			"04"
-			{
-				"var_type"			"FIELD_INTEGER"
-				"vision_radius"		"1500 1000 500 150"
-			}
-			"05"
-			{
-				"var_type"			"FIELD_FLOAT"
-				"vision_duration"	"8.0 4.0 2.0 1.0"
-			}
-			"06"
-			{
-				"var_type"			"FIELD_FLOAT"
-				"hook_followthrough_constant"			"0.65"
-			}
-			"07"
-			{
-				"var_type"			"FIELD_INTEGER"
-				"hook_damage"		"200 400 600 800"
+				"Passive"	"1"
+				"IsHidden"	"1"
+	
+				"Properties"
+				{
+					"MODIFIER_PROPERTY_PHYSICAL_ARMOR_BONUS"	"%bonus_armor"
+					"MODIFIER_PROPERTY_HEALTH_REGEN_CONSTANT"	"%bonus_health_regen"
+				}
 			}
 		}
 	}
-
-
 	//==================================================================================================
-	// Pudge Rot
+	// DK dragon tail
 	//==================================================================================================
-	// Rewrite of the Pudge Rot ability
-	// Author: Valve
-	// Date: 25.09.2015.
-	"pudge_op_rot_lua"
+	// Rewrite of the Dragon Knight Dragon Tail
+	// Author: chrislotix
+	// Date: 02.01.2015.
+	// NOTE: the particle has probably bad attach points
+	"dragon_knight_op_dragon_tail_datadriven"
 	{
 		// General
-		//-------------------------------------------------------------------------------------------------------------														
-		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET | DOTA_ABILITY_BEHAVIOR_TOGGLE | DOTA_ABILITY_BEHAVIOR_IGNORE_CHANNEL | DOTA_ABILITY_BEHAVIOR_IGNORE_BACKSWING"
+		//-------------------------------------------------------------------------------------------------------------
+		"BaseClass"				"ability_datadriven"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_UNIT_TARGET"
+		"AbilityUnitTargetTeam"			"DOTA_UNIT_TARGET_TEAM_ENEMY"
+		"AbilityUnitTargetType"			"DOTA_UNIT_TARGET_HERO | DOTA_UNIT_TARGET_BASIC"
 		"AbilityUnitDamageType"			"DAMAGE_TYPE_MAGICAL"	
 		"SpellImmunityType"				"SPELL_IMMUNITY_ENEMIES_NO"
 		"FightRecapLevel"				"1"
-		"BaseClass"						"ability_lua"
-		"AbilityTextureName"					"pudge_rot"
-		"ScriptFile"						"heroes/hero_pudge/pudge_rot_lua.lua"
+		"AbilityTextureName"			"dragon_knight_dragon_tail"
 	
 		// Precache
 		//-------------------------------------------------------------------------------------------------------------
 		"precache"
 		{
-			"soundfile"			"soundevents/game_sounds_heroes/game_sounds_pudge.vsndevts"
-			"particle"			"particles/units/heroes/hero_pudge/pudge_rot.vpcf"
+			"soundfile"		"soundevents/game_sounds_heroes/game_sounds_dragon_knight.vsndevts"
+			"particle"		"particles/units/heroes/hero_dragon_knight/dragon_knight_dragon_tail.vpcf"
 		}
-			
+	
 		// Casting
 		//-------------------------------------------------------------------------------------------------------------
-		"AbilityCastPoint"				"0 0 0 0"
+		"AbilityCastRange"				"150"
+		"AbilityCastPoint"				"0.0 0.0 0.0 0.0"
+		
+		// Time		
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCooldown"				"12 11 10 9"
 	
+		// Damage.
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityDamage"					"25 50 75 100"
+	
+		// Cost
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityManaCost"				"100 100 100 100"
+		
+		// Special	
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilitySpecial"
+		{
+			"01"
+			{
+				"var_type"				"FIELD_FLOAT"
+				"stun_duration"			"2.5 2.75 3.0 3.25"
+			}
+			"02"
+			{
+				"var_type"				"FIELD_INTEGER"
+				"dragon_cast_range"			"400"
+			}
+		}
+		"OnSpellStart"
+		{
+			"Damage"
+			{
+				"Target"	"TARGET"
+				"Type"		"DOTA_TYPE_MAGICAL"
+				"Damage"	"%AbilityDamage"
+			}
+	
+			"Stun"
+			{
+				"Target"	"TARGET"
+				"Duration"	"%stun_duration"
+			}
+	
+			"FireEffect"
+			{
+				"EffectName"	"particles/units/heroes/hero_dragon_knight/dragon_knight_dragon_tail.vpcf"
+				"Target"		"TARGET"
+			}
+	
+			"FireSound"
+			{
+				"EffectName"	"Hero_DragonKnight.DragonTail.Target"
+				"Target"		"TARGET"
+			}
+	
+		}
+	
+	}
+	//==================================================================================================
+	// DK elder dragon
+	//==================================================================================================
+	// Rewrite of the Dragon Knight Elder Dragon Form
+	// Author: chrislotix/Pizzalol
+	// Date: 03.01.2015.
+	// Changed: 12.01.2015.
+	// Reason: Fixed wearables
+	// NOTE: Dragon Form is always a Green Dragon
+	// NOTE2: -------------------------- Projectile model will be the corresponding dragon form auto attack model --------------------------
+	// Until Valve implements a way to retrieve the original attack projectile
+	// NOTE3: Its important to include
+	// SendToServerConsole("dota_combine_models 0")
+	// SendToConsole("dota_combine_models 0")
+	// in your addon, check barebones.lua in CaptureGameMode() to see how its done
+	"dragon_knight_op_elder_dragon_form_datadriven"
+	{
+		// General
+		//-------------------------------------------------------------------------------------------------------------
+		"BaseClass"				"ability_datadriven"
+		"AbilityBehavior"				"DOTA_ABILITY_BEHAVIOR_NO_TARGET"
+		"AbilityType"					"DOTA_ABILITY_TYPE_ULTIMATE"
+		"SpellImmunityType"				"SPELL_IMMUNITY_ENEMIES_YES"
+		"FightRecapLevel"				"2"
+		"AbilityTextureName"			"dragon_knight_elder_dragon_form"
+	
+		// Precache
+		//-------------------------------------------------------------------------------------------------------------
+		"precache"
+		{
+			"soundfile"		"soundevents/game_sounds_heroes/game_sounds_dragon_knight.vsndevts"
+			"particle"		"particles/units/heroes/hero_dragon_knight/dragon_knight_transform_green.vpcf"
+			"particle"		"particles/units/heroes/hero_dragon_knight/dragon_knight_transform_red.vpcf"
+			"particle"		"particles/units/heroes/hero_dragon_knight/dragon_knight_transform_blue.vpcf"
+			"particle"		"particles/units/heroes/hero_dragon_knight/dragon_knight_elder_dragon_corrosive.vpcf"
+			"particle"		"particles/units/heroes/hero_dragon_knight/dragon_knight_elder_dragon_fire.vpcf"
+			"particle"		"particles/units/heroes/hero_dragon_knight/dragon_knight_elder_dragon_frost.vpcf"
+			"model"			"models/heroes/dragon_knight/dragon_knight_dragon.vmdl"
+			
+		}
+	
+		// Time		
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityCooldown"				"115.0 115.0 115.0"
+	
+		// Cost
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityManaCost"				"50 50 50"		
+	
+		// Stats
+		//-------------------------------------------------------------------------------------------------------------
+		"AbilityModifierSupportValue"	"0.35"	// Attacks are primarily about the damage
 	
 		// Special
 		//-------------------------------------------------------------------------------------------------------------
@@ -757,28 +2416,444 @@
 		{
 			"01"
 			{
-				"var_type"				"FIELD_INTEGER"
-				"rot_radius"			"500"
+				"var_type"					"FIELD_FLOAT"
+				"duration"					"60.0 60.0 60.0"
 			}
 			"02"
 			{
-				"var_type"				"FIELD_FLOAT"
-				"rot_tick"				"0.1"
+				"var_type"					"FIELD_INTEGER"
+				"bonus_movement_speed"		"25 25 25"
 			}
 			"03"
 			{
-				"var_type"				"FIELD_INTEGER"
-				"rot_slow"				"-10 -20 -30 -40"
+				"var_type"					"FIELD_INTEGER"
+				"bonus_attack_range"		"372 372 372"
 			}
-			"04"
+			"05"
 			{
-				"var_type"				"FIELD_INTEGER"
-				"rot_damage"				"40 80 160 320"
+				"var_type"					"FIELD_INTEGER"
+				"corrosive_breath_damage"	"20 20 20"
+			}
+			"06"
+			{
+				"var_type"					"FIELD_FLOAT"
+				"corrosive_breath_duration"	"5.0 5.0 5.0"
+			}
+			"07"
+			{
+				"var_type"					"FIELD_INTEGER"
+				"splash_radius"				"100 200 250"
+			}
+			"08"
+			{
+				"var_type"					"FIELD_INTEGER"
+				"splash_damage_percent"		"100 75 50"
+			}
+			"09"
+			{
+				"var_type"						"FIELD_INTEGER"
+				"frost_bonus_movement_speed"	"-30 -30 -30"
+			}
+			"10"
+			{
+				"var_type"						"FIELD_INTEGER"
+				"frost_bonus_attack_speed"		"-20 -20 -20"
+			}
+			"11"
+			{
+				"var_type"						"FIELD_FLOAT"
+				"frost_duration"				"3.0 3.0 3.0"
+			}
+			"12"
+			{
+				"var_type"					"FIELD_FLOAT"
+				"frost_aoe"					"250"
+			}		
+		}
+	
+		"OnSpellStart"
+		{
+			"FireSound"
+			{
+				"EffectName"	"Hero_DragonKnight.ElderDragonForm"
+				"Target"		"CASTER"
+			}
+	
+			"RunScript"
+			{
+				"ScriptFile"			"scripts/vscripts/heroes/hero_dragon_knight/elder_dragon_form.lua"
+				"Function"				"Transform"
+				"modifier_one"			"modifier_green_dragon_datadriven"
+				"modifier_two"			"modifier_red_dragon_datadriven"
+				"modifier_three"		"modifier_blue_dragon_datadriven"
+			}
+	
+		}
+	
+		"Modifiers"
+		{
+			"modifier_green_dragon_datadriven"
+			{
+				"Duration"	"%duration"
+				"IsHidden"	"1"
+				"AllowIllusionDuplicate"    "1"
+	
+				"OnCreated"
+				{
+					"FireEffect"
+					{
+						"EffectName"	"particles/units/heroes/hero_dragon_knight/dragon_knight_transform_green.vpcf"
+						"EffectAttachType"	"follow_origin"
+						"Target"	"CASTER"
+					}
+	
+					"ApplyModifier"
+					{
+						"ModifierName"	"modifier_corrosive_breath_attack_datadriven"
+						"Target"		"CASTER"
+					}
+	
+					"RunScript"
+					{
+						"ScriptFile"			"scripts/vscripts/heroes/hero_dragon_knight/elder_dragon_form.lua"
+						"Function"				"ModelSwapStart"
+						"model"					"models/heroes/dragon_knight/dragon_knight_dragon.vmdl"
+						"projectile_model"		"particles/units/heroes/hero_dragon_knight/dragon_knight_elder_dragon_corrosive.vpcf"
+					}
+	
+					"RunScript"
+					{
+						"ScriptFile"			"scripts/vscripts/heroes/hero_dragon_knight/elder_dragon_form.lua"
+						"Function"				"HideWearables"
+					}
+				}
+	
+				"OnAttack"
+				{
+					"FireSound"
+					{
+						"EffectName"	"Hero_DragonKnight.ElderDragonShoot1.Attack"
+						"Target"	"CASTER"
+					}
+				}
+	
+				"OnDestroy"
+				{
+					"FireEffect"
+					{
+						"EffectName"	"particles/units/heroes/hero_dragon_knight/dragon_knight_transform_green.vpcf"
+						"EffectAttachType"	"follow_origin"
+						"Target"	"CASTER"
+					}
+	
+					"RunScript"
+					{
+						"ScriptFile"			"scripts/vscripts/heroes/hero_dragon_knight/elder_dragon_form.lua"
+						"Function"				"ModelSwapEnd"
+					}
+	
+					"RunScript"
+					{
+						"ScriptFile"			"scripts/vscripts/heroes/hero_dragon_knight/elder_dragon_form.lua"
+						"Function"				"ShowWearables"
+					}
+				}
+	
+				"OnAttackLanded"
+				{
+					"FireSound"
+					{
+						"EffectName"	"Hero_DragonKnight.ProjectileImpact"
+						"Target"		"TARGET"
+					}
+				}
+	
+				"Properties"
+				{
+					"MODIFIER_PROPERTY_ATTACK_RANGE_BONUS"	"%bonus_attack_range"
+					"MODIFIER_PROPERTY_MOVESPEED_BONUS_CONSTANT" "%bonus_movement_speed"				
+				}
+			}
+	
+			"modifier_red_dragon_datadriven"
+			{
+				"Duration"	"%duration"
+				"IsHidden"	"1"
+				"AllowIllusionDuplicate"    "1"
+	
+				"OnCreated"
+				{
+					"FireEffect"
+					{
+						"EffectName"	"particles/units/heroes/hero_dragon_knight/dragon_knight_transform_red.vpcf"
+						"EffectAttachType"	"follow_origin"
+						"Target"	"CASTER"
+					}
+	
+					"RunScript"
+					{
+						"ScriptFile"			"scripts/vscripts/heroes/hero_dragon_knight/elder_dragon_form.lua"
+						"Function"				"ModelSwapStart"
+						"model"					"models/heroes/dragon_knight/dragon_knight_dragon.vmdl"
+						"projectile_model"		"particles/units/heroes/hero_dragon_knight/dragon_knight_elder_dragon_fire.vpcf"
+					}
+	
+					"RunScript"
+					{
+						"ScriptFile"			"scripts/vscripts/heroes/hero_dragon_knight/elder_dragon_form.lua"
+						"Function"				"HideWearables"
+					}
+	
+					"ApplyModifier"
+					{
+						"ModifierName"	"modifier_corrosive_breath_attack_datadriven"
+						"Target"		"CASTER"
+					}
+	
+					"ApplyModifier"
+					{
+						"ModifierName"	"modifier_splash_attack_datadriven"
+						"Target"		"CASTER"
+					}
+				}
+	
+				"OnDestroy"
+				{
+					"FireEffect"
+					{
+						"EffectName"	"particles/units/heroes/hero_dragon_knight/dragon_knight_transform_red.vpcf"
+						"EffectAttachType"	"follow_origin"
+						"Target"	"CASTER"
+					}
+	
+					"RunScript"
+					{
+						"ScriptFile"			"scripts/vscripts/heroes/hero_dragon_knight/elder_dragon_form.lua"
+						"Function"				"ModelSwapEnd"
+					}
+	
+					"RunScript"
+					{
+						"ScriptFile"			"scripts/vscripts/heroes/hero_dragon_knight/elder_dragon_form.lua"
+						"Function"				"ShowWearables"
+					}
+				}
+	
+				"OnAttack"
+				{
+					"FireSound"
+					{
+						"EffectName"	"Hero_DragonKnight.ElderDragonShoot2.Attack"
+						"Target"	"CASTER"
+					}
+				}
+	
+				
+				"OnAttackLanded"
+				{
+					"FireSound"
+					{
+						"EffectName"	"Hero_DragonKnight.ProjectileImpact"
+						"Target"		"TARGET"
+					}
+				}
+	
+				"Properties"
+				{
+					"MODIFIER_PROPERTY_ATTACK_RANGE_BONUS"	"%bonus_attack_range"
+					"MODIFIER_PROPERTY_MOVESPEED_BONUS_CONSTANT" "%bonus_movement_speed"				
+				}
+			}
+	
+			"modifier_blue_dragon_datadriven"
+			{
+				"Duration"	"%duration"
+				"IsHidden"	"1"
+				"AllowIllusionDuplicate"    "1"
+	
+				"OnCreated"
+				{
+					"FireEffect"
+					{
+						"EffectName"	"particles/units/heroes/hero_dragon_knight/dragon_knight_transform_blue.vpcf"
+						"EffectAttachType"	"follow_origin"
+						"Target"	"CASTER"
+					}
+	
+					"RunScript"
+					{
+						"ScriptFile"			"scripts/vscripts/heroes/hero_dragon_knight/elder_dragon_form.lua"
+						"Function"				"ModelSwapStart"
+						"model"					"models/heroes/dragon_knight/dragon_knight_dragon.vmdl"
+						"projectile_model"		"particles/units/heroes/hero_dragon_knight/dragon_knight_elder_dragon_frost.vpcf"
+					}
+	
+					"RunScript"
+					{
+						"ScriptFile"			"scripts/vscripts/heroes/hero_dragon_knight/elder_dragon_form.lua"
+						"Function"				"HideWearables"
+					}
+	
+					"ApplyModifier"
+					{
+						"ModifierName"	"modifier_corrosive_breath_attack_datadriven"
+						"Target"		"CASTER"
+					}
+	
+					"ApplyModifier"
+					{
+						"ModifierName"	"modifier_splash_attack_datadriven"
+						"Target"		"CASTER"
+					}
+	
+					"ApplyModifier"
+					{
+						"ModifierName"	"modifier_frost_breath_attack_datadriven"
+						"Target"		"CASTER"
+					}
+				}
+	
+				"OnDestroy"
+				{
+					"FireEffect"
+					{
+						"EffectName"	"particles/units/heroes/hero_dragon_knight/dragon_knight_transform_blue.vpcf"
+						"EffectAttachType"	"follow_origin"
+						"Target"	"CASTER"
+					}
+	
+					"RunScript"
+					{
+						"ScriptFile"			"scripts/vscripts/heroes/hero_dragon_knight/elder_dragon_form.lua"
+						"Function"				"ModelSwapEnd"
+					}
+	
+					"RunScript"
+					{
+						"ScriptFile"			"scripts/vscripts/heroes/hero_dragon_knight/elder_dragon_form.lua"
+						"Function"				"ShowWearables"
+					}
+				}
+	
+				"OnAttack"
+				{
+					"FireSound"
+					{
+						"EffectName"	"Hero_DragonKnight.ElderDragonShoot3.Attack"
+						"Target"	"CASTER"
+					}
+				}
+	
+	
+				"OnAttacklanded"
+				{
+	
+					"FireSound"
+					{
+						"EffectName"	"Hero_DragonKnight.ProjectileImpact"
+						"Target"		"TARGET"
+					}
+				}
+	
+				"Properties"
+				{
+					"MODIFIER_PROPERTY_ATTACK_RANGE_BONUS"	"%bonus_attack_range"
+					"MODIFIER_PROPERTY_MOVESPEED_BONUS_CONSTANT" "%bonus_movement_speed"				
+				}
+			}
+	
+			"modifier_corrosive_breath_attack_datadriven"
+			{
+				"Duration"	"%duration"
+	
+				"OnAttackLanded"
+				{
+					"ApplyModifier"
+					{
+						"ModifierName"	"modifier_corrosive_breath_datadriven"
+						"Target"	"TARGET"
+					}
+				}
+			}
+	
+			"modifier_splash_attack_datadriven"
+			{
+				"Duration"	"%duration"
+	
+				"OnAttackLanded"
+				{
+					"RunScript"
+					{
+						"ScriptFile"	"scripts/vscripts/heroes/hero_dragon_knight/elder_dragon_form.lua"
+						"Function"		"Splash"
+					}
+				}
+			}
+	
+			"modifier_frost_breath_attack_datadriven"
+			{
+				"Duration"	"%duration"
+	
+				"OnAttackLanded"
+				{
+					"ActOnTargets"
+					{
+						"Target"
+						{
+							"Center"	"TARGET"
+							"Radius"	"%frost_aoe"
+							"Teams"	"DOTA_UNIT_TARGET_TEAM_ENEMY"
+							"Types" "DOTA_UNIT_TARGET_BASIC | DOTA_UNIT_TARGET_HERO"
+							"Flags" "DOTA_UNIT_TARGET_FLAG_MAGIC_IMMUNE_ENEMIES"
+						}
+						"Action"
+						{
+							"ApplyModifier"
+							{
+								"ModifierName"	"modifier_frost_breath_slow_datadriven"
+								"Target"		"TARGET"
+							}
+						}
+					}
+				}
+			}
+	
+			"modifier_corrosive_breath_datadriven"
+			{
+				"IsDebuff"	"1"
+				"Duration"	"%corrosive_breath_duration"
+	
+				"ThinkInterval"	"1.0"
+	
+				"OnIntervalThink"
+				{
+					"Damage"
+					{
+						"Target"	"TARGET"
+						"Type"		"DAMAGE_TYPE_MAGICAL"
+						"Damage"	"%corrosive_breath_damage"
+					}
+				}
+			}
+	
+			"modifier_frost_breath_slow_datadriven"
+			{
+				"IsDebuff"	"1"
+				"Duration"	"%frost_duration"
+	
+				"Properties"
+				{
+					"MODIFIER_PROPERTY_MOVESPEED_BONUS_PERCENTAGE"	"%frost_bonus_movement_speed"
+					"MODIFIER_PROPERTY_ATTACKSPEED_BONUS_CONSTANT"	"%frost_bonus_attack_speed"
+				}
 			}
 		}
 	}
 
-	
+
+	// Rewrite of Pugna Decrepify
+	// Author: Noya
+	// Date: April 5, 2015
 	//==================================================================================================
 	// PhantomAssassin blur
 	//==================================================================================================
@@ -809,7 +2884,7 @@
 			"02"
 			{
 				"var_type"					"FIELD_FLOAT"
-				"transparency_fade"			"0.1"
+				"transparency_fade"			"0.0"
 			}
 			"03"
 			{
@@ -1003,7 +3078,7 @@
 		// Casting
 		//-------------------------------------------------------------------------------------------------------------
 		"AbilityCastRange"				"500 1000 1500 2000"
-		"AbilityCastPoint"				"1.0 0.5 0.3 0.1"
+		"AbilityCastPoint"				"0.8 0.6 0.2 0.0"
 	
 		// Time		
 		//-------------------------------------------------------------------------------------------------------------
@@ -1015,7 +3090,7 @@
 	
 		// Cost
 		//-------------------------------------------------------------------------------------------------------------
-		"AbilityManaCost"				"50 75 100 150"
+		"AbilityManaCost"				"50 75 100 125"
 		
 		// Special
 		//-------------------------------------------------------------------------------------------------------------
@@ -30142,47 +32217,47 @@
 		}
 	}
 	
-	"lina_fiery_soul_alt1_datadriven"
-	{
-	    // General
-	    //-------------------------------------------------------------------------------------------------------------
-		"BaseClass"                    "ability_datadriven" 
-	    "AbilityBehavior"               ""
-	    "AbilityType"                   ""
-	    "SpellImmunityType"             ""
-	    "AbilityTextureName"            ""
-	
-	    // Precache
-	    //-------------------------------------------------------------------------------------------------------------
-	    "precache"
-	    {
-	
-	    }
-	
-	    // Casting
-	    //-------------------------------------------------------------------------------------------------------------
-	    "AbilityCastPoint"              ""
-	    "AbilityCastRange"              ""
-	
-	    // Time
-	    //-------------------------------------------------------------------------------------------------------------
-	    "AbilityCooldown"               ""
-	
-	    // Cost
-	    //-------------------------------------------------------------------------------------------------------------
-	    "AbilityManaCost"               ""
-	
-	    // Damage
-	    //-------------------------------------------------------------------------------------------------------------
-	    "AbilityDamage"                 ""
-	
-	    // Special
-	    //-------------------------------------------------------------------------------------------------------------
-	    "AbilitySpecial"
-	    {
-	
-	    }
-	}
+//	"lina_fiery_soul_alt1_datadriven"
+//	{
+//	    // General
+//	    //-------------------------------------------------------------------------------------------------------------
+//		"BaseClass"                    "ability_datadriven" 
+//	    "AbilityBehavior"               ""
+//	    "AbilityType"                   ""
+//	    "SpellImmunityType"             ""
+//	    "AbilityTextureName"            ""
+//	
+//	    // Precache
+//	    //-------------------------------------------------------------------------------------------------------------
+//	    "precache"
+//	    {
+//	
+//	    }
+//	
+//	    // Casting
+//	    //-------------------------------------------------------------------------------------------------------------
+//	    "AbilityCastPoint"              ""
+//	    "AbilityCastRange"              ""
+//	
+//	    // Time
+//	    //-------------------------------------------------------------------------------------------------------------
+//	    "AbilityCooldown"               ""
+//	
+//	    // Cost
+//	    //-------------------------------------------------------------------------------------------------------------
+//	    "AbilityManaCost"               ""
+//	
+//	    // Damage
+//	    //-------------------------------------------------------------------------------------------------------------
+//	    "AbilityDamage"                 ""
+//	
+//	    // Special
+//	    //-------------------------------------------------------------------------------------------------------------
+//	    "AbilitySpecial"
+//	    {
+//	
+//	    }
+//	}
 	// Rewrite of the Lina Fiery Soul ability
 	// Author: Pizzalol
 	// Date: 30.12.2014.

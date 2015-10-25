@@ -107,38 +107,6 @@
 		"Ability4"			"phantom_assassin_op_coup_de_grace_datadriven"
 	}
 	//======================================================================================================
-	// Hero: Pudge
-	//======================================================================================================
-	"pudge_op_meat_hook_lua"
-	{
-		"override_hero"		"npc_dota_hero_pudge"
-		"Ability1"			"pudge_op_meat_hook_lua"
-	}
-	//======================================================================================================
-	// Hero: Pudge
-	//======================================================================================================
-	"pudge_op_rot_lua"
-	{
-		"override_hero"		"npc_dota_hero_pudge"
-		"Ability2"			"pudge_op_rot_lua"
-	}
-	//======================================================================================================
-	// Hero: Pudge
-	//======================================================================================================
-	"pudge_op_flesh_heap_lua"
-	{
-		"override_hero"		"npc_dota_hero_pudge"
-		"Ability3"			"pudge_op_flesh_heap_lua"
-	}
-	//======================================================================================================
-	// Hero: Pudge
-	//======================================================================================================
-	"pudge_op_dismember_lua"
-	{
-		"override_hero"		"npc_dota_hero_pudge"
-		"Ability4"			"pudge_op_dismember_lua"
-	}
-	//======================================================================================================
 	// Hero: QOP
 	//======================================================================================================
 	"queenofpain_op_blink_datadriven"
@@ -170,5 +138,133 @@
 		"override_hero"		"npc_dota_hero_queenofpain"
 		"Ability4"			"queenofpain_op_sonic_wave_datadriven"
 	}
+	//======================================================================================================
+	// Hero: DK
+	//======================================================================================================
+	"dragon_knight_op_breathe_fire_datadriven"
+	{
+		"override_hero"		"npc_dota_hero_dragon_knight"
+		"Ability1"			"dragon_knight_op_breathe_fire_datadriven"
+	}
+	//======================================================================================================
+	// Hero: DK
+	//======================================================================================================
+	"dragon_knight_op_dragon_blood_datadriven"
+	{
+		"override_hero"		"npc_dota_hero_dragon_knight"
+		"Ability2"			"dragon_knight_op_dragon_blood_datadriven"
+	}
+	//======================================================================================================
+	// Hero: DK
+	//======================================================================================================
+	"dragon_knight_op_dragon_tail_datadriven"
+	{
+		"override_hero"		"npc_dota_hero_dragon_knight"
+		"Ability3"			"dragon_knight_op_dragon_tail_datadriven"
+	}
+	//======================================================================================================
+	// Hero: DK
+	//======================================================================================================
+	"dragon_knight_op_elder_dragon_form_datadriven"
+	{
+		"override_hero"		"npc_dota_hero_dragon_knight"
+		"Ability4"			"dragon_knight_op_elder_dragon_form_datadriven"
+	}
+	//======================================================================================================
+	// Hero: Lina
+	//======================================================================================================
+	"lina_op_dragon_slave_datadriven"
+	{
+		"override_hero"		"npc_dota_hero_lina"
+		"Ability1"			"lina_op_dragon_slave_datadriven"
+	}
+	//======================================================================================================
+	// Hero: Lina
+	//======================================================================================================
+	"lina_op_fiery_soul_datadriven"
+	{
+		"override_hero"		"npc_dota_hero_lina"
+		"Ability3"			"lina_op_fiery_soul_datadriven"
+	}	//======================================================================================================
+	// Hero: Lina
+	//======================================================================================================
+	"lina_op_light_strike_array_datadriven"
+	{
+		"override_hero"		"npc_dota_hero_lina"
+		"Ability2"			"lina_op_light_strike_array_datadriven"
+	}	
+	//======================================================================================================
+	// Hero: Lina
+	//======================================================================================================
+	"lina_op_laguna_blade_datadriven"
+	{
+		"override_hero"		"npc_dota_hero_lina"
+		"Ability4"			"lina_op_laguna_blade_datadriven"
+	}	
+	//======================================================================================================
+	// Hero: omni
+	//======================================================================================================
+	"omniknight_op_purification_datadriven"
+	{
+		"override_hero"		"npc_dota_hero_omniknight"
+		"Ability1"			"omniknight_op_purification_datadriven"
+	}	
+	//======================================================================================================
+	// Hero: omni
+	//======================================================================================================
+	"omniknight_op_repel_datadriven"
+	{
+		"override_hero"		"npc_dota_hero_omniknight"
+		"Ability2"			"omniknight_op_repel_datadriven"
+	}	
+	//======================================================================================================
+	// Hero: omni
+	//======================================================================================================
+	"omniknight_op_degen_aura_datadriven"
+	{
+		"override_hero"		"npc_dota_hero_omniknight"
+		"Ability3"			"omniknight_op_degen_aura_datadriven"
+	}	
+	//======================================================================================================
+	// Hero: omni
+	//======================================================================================================
+	"omniknight_op_guardian_angel_datadriven"
+	{
+		"override_hero"		"npc_dota_hero_omniknight"
+		"Ability4"			"omniknight_op_guardian_angel_datadriven"
+	}
+	//======================================================================================================
+	// Veno ward
+	//======================================================================================================
+	"venomancer_op_plague_ward_datadriven"
+	{
+		"override_hero"		"npc_dota_hero_venomancer"
+		"Ability3"			"venomancer_op_plague_ward_datadriven"
+	}
+	//======================================================================================================
+	// Veno
+	//======================================================================================================
+	"venomancer_op_poison_sting_datadriven"
+	{
+		"override_hero"		"npc_dota_hero_venomancer"
+		"Ability2"			"venomancer_op_poison_sting_datadriven"
+	}
+	//======================================================================================================
+	// Veno
+	//======================================================================================================
+	"venomancer_op_venomous_gale_datadriven"
+	{
+		"override_hero"		"npc_dota_hero_venomancer"
+		"Ability1"			"venomancer_op_venomous_gale_datadriven"
+	}
+	//======================================================================================================
+	// Veno
+	//======================================================================================================
+	"venomancer_op_poison_nova_datadriven"
+	{
+		"override_hero"		"npc_dota_hero_venomancer"
+		"Ability4"			"venomancer_op_poison_nova_datadriven"
+	}
+
 
 }
